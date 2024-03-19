@@ -102,8 +102,18 @@ plot(NULL,
   ylim = c(0, 1)
 )
 
+cols <- colorRampPalette(c("red", "blue"))
+colors <- cols(length(non_zero_HM))
+
+!TODO
+for (i in 1:ncol(snps)) {
+  if (i == 1) {
+
+  }
+}
+
 for (i in 1:ncol(snps) - 2) {
-  points(snps[, 2], snps[, i+2])
+  points(snps[, 2], snps[, i + 2])
 }
 
 

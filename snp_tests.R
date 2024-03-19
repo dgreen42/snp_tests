@@ -1,5 +1,4 @@
 library(maps)
-library(maps)
 library(mapdata)
 library(randomForest)
 
@@ -33,6 +32,7 @@ manhattan(ph2_data,
   highlight = sig_snps$number
 )
 
+
 # parse latd snp df
 latd_only_snps <- latd_snps[, 3:ncol(latd_snps)]
 write.csv(latd_only_snps, file = "latd_snp_pairs.csv", row.names = FALSE)
@@ -40,6 +40,16 @@ snps <- read.csv("snp_TF.csv")
 total_snps <- NULL
 for (i in 1:ncol(snps)) {
   total_snps[i] <- nrow(snps) - sum(snps[, i])
+}
+snps$X.2.POS <- latd_snps$X.2.POS
+snps$X...1.CHROM <- latd_snps$X...1.CHROM
+plot(NULL,
+  xlim = c(min(snps[, 2]), max(snps[, 2])),
+  ylim = c(0, 1)
+  )
+
+for (i in 1:ncol(snps) - 2) {
+  points(snps[, 2], snps[, i+2])
 }
 
 total_snps_df <- data.frame(HM = colnames(snps), total = total_snps)

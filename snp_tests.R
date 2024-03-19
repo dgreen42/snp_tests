@@ -41,16 +41,7 @@ total_snps <- NULL
 for (i in 1:ncol(snps)) {
   total_snps[i] <- nrow(snps) - sum(snps[, i])
 }
-snps$X.2.POS <- latd_snps$X.2.POS
-snps$X...1.CHROM <- latd_snps$X...1.CHROM
-plot(NULL,
-  xlim = c(min(snps[, 2]), max(snps[, 2])),
-  ylim = c(0, 1)
-  )
 
-for (i in 1:ncol(snps) - 2) {
-  points(snps[, 2], snps[, i+2])
-}
 
 total_snps_df <- data.frame(HM = colnames(snps), total = total_snps)
 non_zero <- total_snps_df[total_snps_df$total > 0, ]
@@ -103,6 +94,19 @@ for (HM in non_zero_HM) {
   }
 }
 rm(counter)
+
+snps$X.2.POS <- latd_snps$X.2.POS
+snps$X...1.CHROM <- latd_snps$X...1.CHROM
+plot(NULL,
+  xlim = c(min(snps[, 2]), max(snps[, 2])),
+  ylim = c(0, 1)
+)
+
+for (i in 1:ncol(snps) - 2) {
+  points(snps[, 2], snps[, i+2])
+}
+
+
 
 # fset
 

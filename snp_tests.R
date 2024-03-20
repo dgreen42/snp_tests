@@ -97,23 +97,31 @@ rm(counter)
 
 snps$X.2.POS <- latd_snps$X.2.POS
 snps$X...1.CHROM <- latd_snps$X...1.CHROM
+
 plot(NULL,
   xlim = c(min(snps[, 2]), max(snps[, 2])),
   ylim = c(0, 1)
 )
 
 cols <- colorRampPalette(c("red", "blue"))
-colors <- cols(length(non_zero_HM))
+colors <- cols(ncol(snps))
 
 !TODO
-for (i in 1:ncol(snps)) {
-  if (i == 1) {
-
+colorframe <- matrix(NA, ncol = ncol(snps) - 2, nrow = nrow(snps))
+for (i in 1:ncol(snps) - 2) {
+  for (j in 1:nrow(snps)) {
+    if (snps[j, i + 2] == 0) {
+      colorframe[j, i + 2] <- colors[i]
+    } else {
+      colorframe[j, i +2] <- "#000000"
+    }
   }
 }
 
+
 for (i in 1:ncol(snps) - 2) {
-  points(snps[, 2], snps[, i + 2])
+  test <- sum(snps[, i + 2] == 0)
+    points(snps[, 2], snps[, i + 2], col = colorframe[, i])
 }
 
 
@@ -133,3 +141,5 @@ map.axes()
 points(fset$LON, fset$LAT, pch = 16)
 
 random - forest <- randomForest(HM_NUMBER ~ ., data = fset)
+
+

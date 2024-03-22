@@ -1,17 +1,25 @@
-library(qqman)
-isntall.packages("qqman")
-install.packages("qqman")
-library(qqman)
 latd_snps <- read.csv("MtLATD SNP data.csv")
-fset <- read.csv("Medicago_fset_climatic-country.csv")
+# parse latd snp df
 latd_only_snps <- latd_snps[, 3:ncol(latd_snps)]
+write.csv(latd_only_snps, file = "latd_snp_pairs.csv", row.names = FALSE)
+
+system2(
+  "parse_snp_pairs",
+  args = "latd_snp_pairs.csv",
+)
+
 snps <- read.csv("snp_TF.csv")
 total_snps <- NULL
 for (i in 1:ncol(snps)) {
   total_snps[i] <- nrow(snps) - sum(snps[, i])
 }
+
+
 total_snps_df <- data.frame(HM = colnames(snps), total = total_snps)
 non_zero <- total_snps_df[total_snps_df$total > 0, ]
+write.table(non_zero, "non_zero.txt")
+# at this point the non_zero dataframe is written to a text file and I
+# copy and pasted in the HM names so they do not have the extension
 non_zero_HM <- c(
   "HM006",
   "HM007",
@@ -33,23 +41,8 @@ non_zero_HM <- c(
   "HM308",
   "HM311"
 )
+
 non_zero$sname <- non_zero_HM
-snps$X.2.POS <- latd_snps$X.2.POS
-snps$X...1.CHROM <- latd_snps$X...1.CHROM
-snpscols <- snps[, 3:ncol(snps)]
-shaperecurs <- function(i = 1, n = NULL, base = NULL, shape = NULL) {
-  if (i != base + 1) {
-    shape <- c(shape, rep(i, n))
-    i <- i + 1
-    return
-    shaperecurs(
-      i = i,
-      n = n,
-      base = base,
-      shape = shape
-    )
-  } else {
-    return(shape)
-  }
-}
-quit(save = "yes")
+
+barplot(total ~ sname, non_zero, las = 2, xlab = NULL, ann = FALSE)
+title("Number of LATD SNPS in each HM", ylab = "Number of SNPs")

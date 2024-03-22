@@ -1,91 +1,10 @@
-library(qqman)
 library(maps)
 library(mapdata)
 library(randomForest)
 
-data <- read.csv("ORCDRC_all_SNPs_for_percentiles.csv")
-ph2_data <- read.csv("pH2_all_SNPs_for_percentiles.csv")
 latd_snps <- read.csv("MtLATD SNP data.csv")
 fset <- read.csv("Medicago_fset_climatic-country.csv")
 sig_snps <- read.csv("significant_snps.csv")
-
-plot(data$p ~ data$Chr)
-
-sig_data <- data[data$p > 0.99, ]
-
-boxplot(sig_data$p ~ sig_data$Chr)
-
-jpeg("ORCDRC SNPS with LATD SNPS highlighted.jpeg")
-manhattan(data,
-  chr = "Chr",
-  bp = "Pos",
-  p = "p",
-  snp = "X",
-  highlight = latd_snps$X.2.POS
-)
-title("ORCDRC SNPS with LATD SNPS highlighted")
-dev.off()
-
-jpeg("ph2 SNPS with LATD SNPS highlighted.jpeg")
-manhattan(ph2_data,
-  chr = "Chr",
-  bp = "Pos",
-  p = "p",
-  snp = "X",
-  highlight = sig_snps$number
-)
-title("ph2 SNPS with LATD SNPS highlighted")
-dev.off()
-
-jpeg("ph2 SNPS with LATD SNPS highlighted.jpeg")
-manhattan(ph2_data,
-  chr = "Chr",
-  bp = "Pos",
-  p = "p",
-  snp = "X",
-  highlight = latd_snps$X.2.POS
-)
-title("ph2 SNPS with LATD SNPS highlighted")
-dev.off()
-
-
-# parse latd snp df
-latd_only_snps <- latd_snps[, 3:ncol(latd_snps)]
-write.csv(latd_only_snps, file = "latd_snp_pairs.csv", row.names = FALSE)
-snps <- read.csv("snp_TF.csv")
-total_snps <- NULL
-for (i in 1:ncol(snps)) {
-  total_snps[i] <- nrow(snps) - sum(snps[, i])
-}
-
-
-total_snps_df <- data.frame(HM = colnames(snps), total = total_snps)
-non_zero <- total_snps_df[total_snps_df$total > 0, ]
-write.table(non_zero, "non_zero.txt")
-
-non_zero_HM <- c(
-  "HM006",
-  "HM007",
-  "HM011",
-  "HM038",
-  "HM098",
-  "HM112",
-  "HM126",
-  "HM151",
-  "HM156",
-  "HM163",
-  "HM165",
-  "HM170",
-  "HM178",
-  "HM197",
-  "HM208",
-  "HM218",
-  "HM224",
-  "HM308",
-  "HM311"
-)
-
-non_zero$sname <- non_zero_HM
 
 barplot(total ~ sname, non_zero, las = 2, xlab = NULL, ann = FALSE)
 title("Number of LATD SNPS in each HM", ylab = "Number of SNPs")
@@ -111,6 +30,8 @@ for (HM in non_zero_HM) {
 }
 rm(counter)
 
+snps <- read.csv("snp_TF.csv")
+
 snps$X.2.POS <- latd_snps$X.2.POS
 snps$X...1.CHROM <- latd_snps$X...1.CHROM
 snpscols <- snps[, 3:ncol(snps)]
@@ -132,7 +53,13 @@ shaperecurs <- function(i = 1, n = NULL, base = NULL, shape = NULL) {
   }
 }
 
-snum <- shaperecurs(i = 2, n = nrow(snpscols), base = ncol(snpscols), shape = shape <- NULL)
+snum <- shaperecurs(
+  i = 2,
+  n = nrow(snpscols),
+  base = ncol(snpscols),
+  shape = shape <- NULL
+)
+
 snumat <- matrix(snum, ncol = ncol(snpscols), nrow = nrow(snpscols))
 
 pchframe <- matrix(NA, ncol = ncol(snpscols), nrow = nrow(snpscols))

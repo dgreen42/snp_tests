@@ -1,3 +1,4 @@
+library(qqman)
 library(maps)
 library(mapdata)
 library(randomForest)
@@ -14,6 +15,7 @@ sig_data <- data[data$p > 0.99, ]
 
 boxplot(sig_data$p ~ sig_data$Chr)
 
+jpeg("ORCDRC SNPS with LATD SNPS highlighted.jpeg")
 manhattan(data,
   chr = "Chr",
   bp = "Pos",
@@ -21,9 +23,10 @@ manhattan(data,
   snp = "X",
   highlight = latd_snps$X.2.POS
 )
+title("ORCDRC SNPS with LATD SNPS highlighted")
+dev.off()
 
-
-
+jpeg("ph2 SNPS with LATD SNPS highlighted.jpeg")
 manhattan(ph2_data,
   chr = "Chr",
   bp = "Pos",
@@ -31,6 +34,19 @@ manhattan(ph2_data,
   snp = "X",
   highlight = sig_snps$number
 )
+title("ph2 SNPS with LATD SNPS highlighted")
+dev.off()
+
+jpeg("ph2 SNPS with LATD SNPS highlighted.jpeg")
+manhattan(ph2_data,
+  chr = "Chr",
+  bp = "Pos",
+  p = "p",
+  snp = "X",
+  highlight = latd_snps$X.2.POS
+)
+title("ph2 SNPS with LATD SNPS highlighted")
+dev.off()
 
 
 # parse latd snp df
@@ -101,7 +117,7 @@ snpscols <- snps[, 3:ncol(snps)]
 
 
 shaperecurs <- function(i = 1, n = NULL, base = NULL, shape = NULL) {
-  if (i != base) {
+  if (i != base + 1) {
     shape <- c(shape, rep(i, n))
     i <- i + 1
     return
@@ -116,19 +132,15 @@ shaperecurs <- function(i = 1, n = NULL, base = NULL, shape = NULL) {
   }
 }
 
-shape <- NULL
-numshape <- shaperecurs(
-  i = 1,
-  n = n,
-  base = 22,
-  shape = shape
-)
+snum <- shaperecurs(i = 2, n = nrow(snpscols), base = ncol(snpscols), shape = shape <- NULL)
+snumat <- matrix(snum, ncol = ncol(snpscols), nrow = nrow(snpscols))
 
 pchframe <- matrix(NA, ncol = ncol(snpscols), nrow = nrow(snpscols))
 for (i in 1:ncol(snpscols)) {
   for (j in 1:nrow(snpscols)) {
     if (snpscols[j, i] == 0) {
-      pchframe[j, i] <- shape[i]
+      print(i + j)
+      pchframe[j, i] <- snum[i + j]
     } else {
       pchframe[j, i] <- 1
     }
@@ -142,7 +154,11 @@ plot(NULL,
 
 for (i in 1:ncol(snps) - 2) {
   test <- sum(snps[, i + 2] == 0)
-  points(snps[, 2], snps[, i + 2], pch = pchframe)
+  if (test > 0) {
+    points(snps[, 2], snps[, i + 2], pch = pchframe[, i])
+  } else {
+    points(snps[, 2], snps[, i + 2], col = "red")
+  }
 }
 
 
